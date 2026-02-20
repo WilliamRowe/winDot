@@ -44,7 +44,7 @@ Push-Location $PSScriptRoot
 
 Function Get-UserResponse {
     param ($Msg = "Do you want to continue? (Y/N)")
-    do {# Simple Yes/No validation loop in PowerShell
+    do {# Simple Yes/No validation loop
         $response = Read-Host $Msg
         $response = $response.Trim().ToUpper()
         switch ($response) {
@@ -77,7 +77,7 @@ Write-Verbose "capture current git user"
 $currentGitEmail = (git config --global user.email)
 $currentGitName = (git config --global user.name)
 
-# Create Symbolic Links
+Write-Verbose "Create Symbolic Links"
 foreach ($symlink in $symlinks.GetEnumerator()) {
     $source = $symlink.key; $destination = $symlink.value
     if (-not(Test-Path $source)) { continue } # skip linking if we don't have a source file.
