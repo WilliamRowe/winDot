@@ -12,7 +12,6 @@ param()
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Host "Restarting script as Administrator..." -ForegroundColor Yellow
     $PSexe = (Get-Process -Id $PID).Path # get current PowerShell executable path
-    #Start-Process $PSexe "-NoProfile -NoExit -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     Start-Process $PSexe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     return
 }
