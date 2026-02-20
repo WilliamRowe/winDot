@@ -124,7 +124,7 @@ function prompt {
     # build prompt components
     #>
     $TimeStamp = @{ Object = "[$(get-date -f 'HH:mm:ss')] "; ForegroundColor = $colorSetting.accentColor; NoNewline = $true }
-    $UserName = @{ Object = "$($env:USERNAME.ToLower())"; ForegroundColor = $colorSetting.userColor; NoNewline = $true }
+    $UserName = @{ Object = "$([System.Environment]::UserName.ToLower())"; ForegroundColor = $colorSetting.userColor; NoNewline = $true }
     $atSymbol = @{ Object = "@"; ForegroundColor = $colorSetting.accentColor; NoNewline = $true }
     $computerName = @{ Object = "$($env:COMPUTERNAME.ToLower())"; ForegroundColor = $colorSetting.computerColor; NoNewline = $true }
     $colonSymbol = @{ Object = " : "; ForegroundColor = $colorSetting.Default; NoNewline = $true }
