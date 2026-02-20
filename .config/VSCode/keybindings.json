@@ -1,0 +1,11 @@
+[
+    { "key": "ctrl+t",      "command": "workbench.action.terminal.externalTerminal",    "when": "editorTextFocus" },
+    { "key": "ctrl+r",      "command": "workbench.action.reloadWindow"},
+    { "key": "ctrl+d",      "command": "highlight-duplicates.toggleHighlightDuplicates" },
+    { "key": "ctrl+shift+t","command": "workbench.action.terminal.newWithProfile",
+        "args": {
+            "profileName": "pwsh",
+            "location": "editor"
+        }
+    }
+]

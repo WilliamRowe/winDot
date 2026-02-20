@@ -1,0 +1,30 @@
+{
+    "folders": [
+        {
+            "path": ".."
+        }
+    ],
+    "settings": {
+        
+    },
+    "extensions": {
+        "recommendations": [
+            // Theme
+            "catppuccin.catppuccin-vsc",
+
+            // Utilities
+            "appulate.filewatcher",
+            "mhutchie.git-graph",
+            "alefragnani.project-manager",
+            "oderwat.indent-rainbow",
+            "medo64.render-crlf",
+            "streetsidesoftware.code-spell-checker",
+
+
+            // Languages
+            "davidanson.vscode-markdownlint",
+            "ms-vscode.powershell"
+
+        ]
+    }
+}

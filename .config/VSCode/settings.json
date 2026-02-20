@@ -1,0 +1,44 @@
+{
+    "security.allowedUNCHosts": [],
+    "telemetry.telemetryLevel": "off",
+    "workbench.colorTheme": "Aura Dark",
+    "window.zoomLevel": 0.0,
+    "terminal.integrated.minimumContrastRatio": 1,
+    "terminal.integrated.cwd": "${workspaceFolder}",
+    "terminal.integrated.fontSize": 14,
+    
+    "editor.mouseWheelZoom": true,
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+
+    "git.defaultCloneDirectory": "${userHome}\\code\\",
+    "git.autofetch": true,
+
+    "[html]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+
+    "powershell.cwd": "${workspaceFolder}",
+    "powershell.powerShellDefaultVersion": "",
+    "powershell.promptToUpdatePowerShell": true,
+    "powershell.enableProfileLoading": false,
+    "powershell.startAutomatically": true,
+
+    "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
+    "powershell.codeFormatting.autoCorrectAliases": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.codeFormatting.useCorrectCasing": true,
+    "powershell.integratedConsole.startInBackground": true,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "powershell.codeFormatting.openBraceOnSameLine": true,
+    "powershell.codeFormatting.newLineAfterOpenBrace": true,
+    "powershell.codeFormatting.newLineAfterCloseBrace": false,
+    "powershell.codeFormatting.preset": "OTBS",
+    "powershell.codeFormatting.whitespaceBetweenParameters": true,
+    
+    "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+    "powershell.pester.outputVerbosity": "Detailed",
+    "powershell.pester.debugOutputVerbosity": "Detailed"
+}
