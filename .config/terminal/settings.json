@@ -28,7 +28,15 @@
     ],
     "profiles": 
     {
-        "defaults": {},
+        "defaults": 
+        {
+            "colorScheme": "Campbell",
+            "experimental.retroTerminalEffect": false,
+            "font": 
+            {
+                "face": "Lucida Console"
+            }
+        },
         "list": 
         [
             {
