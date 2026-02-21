@@ -1,31 +1,51 @@
 {
-    "security.allowedUNCHosts": [],
+    "security.allowedUNCHosts": [
+        "wsl.localhost",
+        "wsl$"
+    ],
+    "liveServer.settings.donotShowInfoMsg": true,
+    "remote.autoForwardPortsSource": "hybrid",
     "telemetry.telemetryLevel": "off",
+    "workbench.colorCustomizations": {},
+    "workbench.iconTheme": "Aura Dark",
     "workbench.colorTheme": "Aura Dark",
+    "workbench.startupEditor": "none",
+    "workbench.sideBar.location": "right",
+    // "workbench.layoutControl.enabled": false,
+    // "workbench.statusBar.visible": false,
+    "workbench.activityBar.location": "hidden",
+    "workbench.editor.empty.hint": "hidden",
+    //"window.menuBarVisibility": "",
+    "window.commandCenter": false,
     "window.zoomLevel": 0.0,
     "terminal.integrated.minimumContrastRatio": 1,
     "terminal.integrated.cwd": "${workspaceFolder}",
     "terminal.integrated.fontSize": 14,
-    
+    "editor.lineHeight": 1.5,
     "editor.mouseWheelZoom": true,
     "editor.detectIndentation": false,
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
-
-    "git.defaultCloneDirectory": "${userHome}\\code\\",
+    "editor.linkedEditing": true,
+    "editor.formatOnSave": true,
+    "editor.smoothScrolling": true,
+    "editor.fontLigatures": false,
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+    "explorer.compactFolders": false,
+    "explorer.decorations.colors": false,
+    "files.autoSave": "afterDelay",
+    "git.defaultCloneDirectory": "${userHome}\\repo\\",
     "git.autofetch": true,
-
+    "git.openRepositoryInParentFolders": "never",
     "[html]": {
         "editor.tabSize": 2,
         "editor.insertSpaces": true
     },
-
     "powershell.cwd": "${workspaceFolder}",
     "powershell.powerShellDefaultVersion": "",
     "powershell.promptToUpdatePowerShell": true,
     "powershell.enableProfileLoading": false,
     "powershell.startAutomatically": true,
-
     "powershell.codeFormatting.avoidSemicolonsAsLineTerminators": true,
     "powershell.codeFormatting.autoCorrectAliases": true,
     "powershell.codeFormatting.useConstantStrings": true,
@@ -37,8 +57,9 @@
     "powershell.codeFormatting.newLineAfterCloseBrace": false,
     "powershell.codeFormatting.preset": "OTBS",
     "powershell.codeFormatting.whitespaceBetweenParameters": true,
-    
     "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
     "powershell.pester.outputVerbosity": "Detailed",
-    "powershell.pester.debugOutputVerbosity": "Detailed"
+    "powershell.pester.debugOutputVerbosity": "Detailed",
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.runInTerminal": true
 }

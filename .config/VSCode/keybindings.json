@@ -1,11 +1,70 @@
 [
-    { "key": "ctrl+t",      "command": "workbench.action.terminal.externalTerminal",    "when": "editorTextFocus" },
-    { "key": "ctrl+r",      "command": "workbench.action.reloadWindow"},
-    { "key": "ctrl+d",      "command": "highlight-duplicates.toggleHighlightDuplicates" },
-    { "key": "ctrl+shift+t","command": "workbench.action.terminal.newWithProfile",
+    {
+        "key": "ctrl+t",
+        "command": "workbench.action.terminal.externalTerminal",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+r",
+        "command": "workbench.action.reloadWindow"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "highlight-duplicates.toggleHighlightDuplicates"
+    },
+    {
+        "key": "ctrl+shift+t",
+        "command": "workbench.action.terminal.newWithProfile",
         "args": {
             "profileName": "pwsh",
             "location": "editor"
         }
+    },
+    {
+        "key": "ctrl+k ctrl+shift+s",
+        "command": "-workbench.action.files.saveWithoutFormatting"
+    },
+    {
+        "key": "ctrl+shift+s",
+        "command": "-workbench.action.files.saveAs"
+    },
+    {
+        "key": "ctrl+s",
+        "command": "workbench.action.files.saveLocalFile",
+        "when": "remoteFileDialogVisible"
+    },
+    {
+        "key": "ctrl+shift+s",
+        "command": "-workbench.action.files.saveLocalFile",
+        "when": "remoteFileDialogVisible"
+    },
+    {
+        "key": "ctrl+shift+s",
+        "command": "workbench.scm.focus"
+    },
+    {
+        "key": "shift+alt+e",
+        "command": "-PowerShell.ExpandAlias",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+    },
+    {
+        "key": "shift+alt+e",
+        "command": "revealFileInOS",
+        "when": "editorFocus"
+    },
+    {
+        "key": "shift+alt+r",
+        "command": "-revealFileInOS",
+        "when": "!editorFocus"
+    },
+    {
+        "key": "shift+alt+e",
+        "command": "remote-wsl.revealInExplorer",
+        "when": "editorFocus && remoteName == 'wsl'"
+    },
+    {
+        "key": "shift+alt+r",
+        "command": "-remote-wsl.revealInExplorer",
+        "when": "editorFocus && remoteName == 'wsl'"
     }
 ]

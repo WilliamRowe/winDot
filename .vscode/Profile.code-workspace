@@ -19,8 +19,6 @@
             "oderwat.indent-rainbow",
             "medo64.render-crlf",
             "streetsidesoftware.code-spell-checker",
-
-
             // Languages
             "davidanson.vscode-markdownlint",
             "ms-vscode.powershell"
