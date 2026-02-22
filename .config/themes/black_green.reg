@@ -1,0 +1,33 @@
+Windows Registry Editor Version 5.00
+; Black Green Theme preset
+; for Taskbar, Start Menu, Action Center, Title Bar (10 & 11)
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Accent]
+"AccentColorMenu"=dword:0045c857      ; Window borders and titlebar
+"StartColorMenu"=dword:0045c857       ; Modals in UWP ex. Apply new refresh rate in 10
+"AccentPalette"=hex:\
+    95,ef,81,00,\                     ; Links in action center and apps
+    45,e5,32,00,\                     ; Taskbar icons underline
+    19,a1,15,00,\                     ; Start button hover
+    10,7c,10,00,\                     ; Settings icons and links [Blue]
+    0e,6d,0e,00,\                     ; Startmenu background / Active taskbar button - IF "EnableTransparency"=dword:00000000
+    08,4b,08,00,\                     ; Taskbar front and Folders on start list background [None]
+    03,2b,03,00,\                     ; Taskbar background - IF "EnableTransparency"=dword:00000001
+    4c,4a,48,00                       ; Unused
+"AccentColor"=dword:0045c857
+"StartColor"=dword:0045c857
+"ColorizationColor"=dword:0045c857
+"TaskbarColorOverride"=dword:0045c857
+"ColorPrevalence"=dword:00000001
+"EnableWindowColorization"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\DWM]
+"ColorPrevalence"=dword:00000001      ; Show accent color on Title bars and window borders [x]
+"AccentColor"=dword:0045c857          ; Active title bars - black unsupported in the UI but works with AccentPalette
+"AccentColorInactive"=dword:0045c857  ; Inactive title bars
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
+"ColorPrevalence"=dword:00000001      ; Show accent color on Start, taskbar and action center [x]
+"AppsUseLightTheme"=dword:00000000    ; Apps mode [Dark]
+"SystemUsesLightTheme"=dword:00000000 ; Windows mode [Dark]
+"EnableTransparency"=dword:00000000   ; Transparency []
