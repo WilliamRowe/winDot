@@ -5,32 +5,35 @@
 .NOTES
     Author: Will Rowe
 #>
-
 [CmdletBinding()]
 param()
-if ([Environment]::GetCommandLineArgs().Contains("-NonInteractive")) { return } # do NOT execute for non-interactive sessions
+if ([Environment]::GetCommandLineArgs().Contains('-NonInteractive')) { return } # do NOT execute for non-interactive sessions
 [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 [system.console]::Clear()
 
 # Environment Variables 🌐
-$Env:PSProfile = $PSCommandPath
-if ((Get-Item -LiteralPath $PSCommandPath -Force).Target) {
+if ((Get-Item -LiteralPath $PSCommandPath -Force).Target) { 
     $Env:PSProfile = (Get-Item -LiteralPath $PSCommandPath -Force).Target
+} else {
+    $Env:PSProfile = $PSCommandPath
 }
 $Env:ProfileRepo = (Split-Path $Env:PSProfile -Parent)
+$Env:Configs = (Join-Path $Env:ProfileRepo '.config')
 $Env:Functions = (Join-Path $Env:ProfileRepo 'functions')
 $Env:Scripts = (Join-Path $Env:ProfileRepo 'scripts')
+$Env:WallPapers = (Join-Path $Env:Configs 'walls')
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Functions 🎉
 foreach ($import in @(Get-ChildItem $Env:Functions\*.ps1 -Recurse -ErrorAction SilentlyContinue)) {
     if ($null -eq $import.fullname) { continue }
-    try { # "Dot source" import functions
+    try {
+        # "Dot source" import functions
         # 'ExecutionContext' optimized method to improve import times when function file counts increase.
         $ExecutionContext.InvokeCommand.InvokeScript( 
             $false,
-            ([scriptblock]::Create([io.file]::ReadAllText($import.FullName,[Text.Encoding]::UTF8))),
+            ([scriptblock]::Create([io.file]::ReadAllText($import.FullName, [Text.Encoding]::UTF8))),
             $null,
             $null
         )
@@ -43,9 +46,9 @@ foreach ($import in @(Get-ChildItem $Env:Functions\*.ps1 -Recurse -ErrorAction S
         }
     }
 }
-function which { param($cmd) get-command "*$($cmd)*" }
+function which { param($cmd) Get-Command "*$($cmd)*" }
 
-function def { param($cmd); return (get-command $cmd | Select-Object -ExpandProperty Definition) }
+function def { param($cmd); return (Get-Command $cmd | Select-Object -ExpandProperty Definition) }
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Aliases 🔗
