@@ -4,7 +4,9 @@
         "mhutchie.git-graph",
         "streetsidesoftware.code-spell-checker",
         "davidanson.vscode-markdownlint",
-        // other useful extensions
+        "appulate.filewatcher",
+        "mhutchie.git-graph",
+        "alefragnani.project-manager",
         "pspester.pester-test",
         "redhat.vscode-yaml",
         "dotjoshjohnson.xml",
@@ -17,22 +19,18 @@
         "lordbrom.highlight-duplicates",
         "c10udburst.macro-recorder",
         "hediet.vscode-drawio",
-        // WSL and Remote Development
         "ms-vscode-remote.remote-wsl",
         "ms-vscode-remote.remote-ssh",
         "ms-vscode-remote.remote-ssh-edit",
         "ms-vscode.remote-explorer",
-        // Ansible
         "redhat.ansible",
-        // Splunk
         "splunk.splunk",
         // "arcsector.vscode-splunk-search-linter",
         // "arcsector.vscode-splunk-search-syntax",
         // Copilot
         "github.copilot",
         "github.copilot-chat",
-        // Theme
-        "altonmenezes.aura-theme"
+        "Daltonmenezes.aura-theme"
         // "fabiospampinato.vscode-monokai-night"
         // "gerane.theme-flatlandmonokai"
     ]
