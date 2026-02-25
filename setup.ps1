@@ -5,97 +5,93 @@
     .NOTES
         Author: Will Rowe
 #>
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ## # # # # # # # # # # # # # # # # #
-[CmdletBinding()]
-param()
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+[CmdletBinding(DefaultParameterSetName = 'Default')]
+param(
+    [Alias('CurrentUserSettings')]
+    [Switch]$UI = [Switch]::Present,
+
+    [Alias('PSModuleName')]
+    [string[]]$PSModules = @(
+        #'SecretManagement.KeePass'
+        'Microsoft.PowerShell.SecretStore'
+        'Microsoft.PowerShell.SecretManagement'
+        'ThreadJob'
+        'PSScriptAnalyzer'
+        'InvokeBuild'
+        'Pester'
+        'PoShKeePass'
+        'PsPAS'
+        'Terminal-Icons'
+    ),
+
+    [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
+    [string[]]$Choco = @(
+        'Git'
+        'PowerShell.Core'
+        'VSCode'
+        'PowerToys'
+    ),
+
+    $symlinks = [Ordered]@{
+        'profile.ps1'                     = $PROFILE.CurrentUserAllHosts
+        '.config\vscode\settings.json'    = "$env:APPDATA\code\user\settings.json"
+        '.config\vscode\keybindings.json' = "$env:APPDATA\code\user\keybindings.json"
+        '.config\vscode\extensions.json'  = "$env:APPDATA\code\user\extensions.json"
+        '.config\terminal\settings.json'  = "$HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+        '.config\git\.gitconfig'          = "$HOME\.gitconfig"
+        '.config\fonts'                   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+    },
+
+    [Switch]$VScode = (if (Get-Command code.cmd -ErrorAction SilentlyContinue) { [Switch]::Present }),
+
+    [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
+    [Switch]$LockScreen,
+
+    [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
+    [Switch]$PowerConfig,
+
+    [Switch]$Force
+)
 #Requires -Version 7.0
-if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity ]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
-    $msg = "Restarting $PSCommandPath script as Administrator"
-    $PSexe = (Get-Process -Id $PID).Path # get current PowerShell executable path
-    $argString = $(foreach ($key in $PSBoundParameters.Keys) { 
-            if ($PSBoundParameters[$key] -is [switch] -and $PSBoundParameters[$key].IsPresent) { "-$key"; continue }
-            if ($PSBoundParameters[$key] -is [string]) { "-$key `"$PSBoundParameters[$key]`"" } else { "-$key $PSBoundParameters[$key]" }
-        }) -join ' '
-    if ($null -ne $argString) { $msg = "$msg, with additional arguments { $argString }" }
-    Write-Host $msg -ForegroundColor Yellow
-    #Start-Process $PSexe "-NoExit -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-    Start-Process $PSexe "-NoExit -ExecutionPolicy Bypass -File `"$PSCommandPath`" $argString" -Verb RunAs
-    return
+# load-in current profile, first time to populate initial environment variables, functions, etc.
+if ($Force -or ($null -eq $env:SETUP_INSTALL_STATE)) {
+    . .\profile.ps1
+    $env:SETUP_INSTALL_STATE = 'partial'
 }
 
-# link configurations ( repo Source => local Destination )
-$symlinks = [Ordered]@{
-    'profile.ps1'                     = $PROFILE.CurrentUserAllHosts
-    '.config\vscode\settings.json'    = "$env:APPDATA\code\user\settings.json"
-    '.config\vscode\keybindings.json' = "$env:APPDATA\code\user\keybindings.json"
-    '.config\vscode\extensions.json'  = "$env:APPDATA\code\user\extensions.json"
-    '.config\terminal\settings.json'  = "$HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-    '.config\git\.gitconfig'          = "$HOME\.gitconfig"
-    '.config\fonts'                   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
-}
-
-# Chocolatey Packages 
-$chocoDep = @(
-    'Git'
-    'PowerShell.Core'
-    'VSCode'
-    'PowerToys'
-)
-
-# PS Modules to install
-$psModules = @(
-    'ThreadJob'
-    'PSScriptAnalyzer'
-    'InvokeBuild'
-    'Pester'
-    'Terminal-Icons'
-)
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # ## # # # # # # # # # # # # # # # # #
-Push-Location $Env:Scripts
-function Get-UserResponse {
-    param ($Msg = 'Do you want to continue? (Y/N)')
-    do {
-        # Simple Yes/No validation loop
-        $response = Read-Host $Msg
-        $response = $response.Trim().ToUpper()
-        switch ($response) {
-            'Y' { $valid = $true; $return = $true; break }
-            'N' { $valid = $true; $return = $false; break }
-            default { Write-Host 'Invalid input. Please enter Y or N.' -ForegroundColor Red; $valid = $false; break }
-        }
-    } until ($valid)
-    return $return
-}
+# move PS profile off of OneDrive, if discovered
 if ($PROFILE.CurrentUserAllHosts -match [regex]::Escape($env:OneDrive)) {
     Write-Warning "PS Profile is located on OneDrive filesystem! [$($PROFILE.CurrentUserAllHosts)]
-    It is recommended to move the Powershell profile off of OneDrive,
-    and move it back onto to local filesystem for performance and stability."
-    $response = Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)'
-    if ($response) {
+      It is recommended to move the Powershell profile off of OneDrive,
+        and move it back onto to local filesystem for performance and stability."
+    if ($force -or $(Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)')) {
         Write-Host 'Attempting to move PowerShell profile off of OneDrive to local FileSystem...'
-        . '.\Move-ProfileLocal.ps1' @PSBoundParameters
+        . "$Env:Scripts\Move-ProfileLocal.ps1" @PSBoundParameters
     }
 }
 
-Write-Verbose 'applying UI configurations...'
-. '.\Set-UI.ps1' @PSBoundParameters -DesktopImagePath "$env:WallPapers\979745.jpg" -LockScreenImagePath "$env:WallPapers\986372.jpg" -AccentColor '57c845' -SecondaryColor '1f4919'
-
-reg import "$env:Config\themes\Dark_Green.reg"
-
-Write-Verbose 'applying power configurations...'
-. '.\Set-PowerConfig.ps1' @PSBoundParameters
-
-if (Get-Command code.cmd -ErrorAction SilentlyContinue) {
-    . '.\Install-VSCodeExtension.ps1' @PSBoundParameters -Extensions (Get-Content (Join-Path $env:Configs 'vscode\extensions.json') -Raw | ConvertFrom-Json).recommendations
+if ($PSModule -or $Force) { Update-PSModules $psModules } 
+ 
+if ($UI -or $Force) { 
+    Write-Verbose 'applying UI configurations...'
+    & "$Env:Scripts\Set-UI.ps1" @PSBoundParameters -DesktopImagePath $Env:WallPaper -AccentColor $Env:AccentColor -SecondaryColor $Env:SecondaryColor
 }
 
-Write-Verbose 'install PS modules'
-foreach ($psModule in $psModules) {
-    if (!(Get-Module -ListAvailable -Name $psModule)) {
-        Install-Module -Name $psModule -Force -AcceptLicense -Scope CurrentUser
-    }
+if ($LockScreen -or $Force) {
+    Write-Verbose 'applying lock screen configurations...'
+    & "$Env:Scripts\Set-UI.ps1" -LockScreenImagePath $Env:LockScreen 
 }
 
+if ($PowerConfig -or $Force) { 
+    Write-Verbose 'applying power configurations...'
+    & "$Env:Scripts\Set-PowerConfig.ps1" @PSBoundParameters
+}
+
+if ($VScode -or $Force) {
+    . "$Env:Scripts\Install-VSCodeExtension.ps1" @PSBoundParameters -Extensions (Get-Content (Join-Path $env:Configs 'vscode\extensions.json') -Raw | ConvertFrom-Json).recommendations
+}
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 Write-Verbose 'capture current git user'
 $currentGitEmail = (git config --global user.email)
 $currentGitName = (git config --global user.name)
@@ -104,12 +100,27 @@ Write-Verbose 'Create Symbolic Links'
 foreach ($symlink in $symlinks.GetEnumerator()) {
     $source = $symlink.key; $destination = $symlink.value
     if (-not(Test-Path $source)) { continue } # skip linking if we don't have a source file at the moment.
-    Write-Host "Linking File: $source to local path: $destination" -ForegroundColor Cyan
-    Get-Item -Path $destination -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
-    New-Item -ItemType SymbolicLink -Path $destination -Target (Resolve-Path $source) -Force | Out-Null
+    try {
+        Write-Host "Attempting SymLink on File: $source to local path: $destination" -ForegroundColor Cyan
+        Get-Item -Path $destination -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        New-Item -ItemType SymbolicLink -Path $destination -Target (Resolve-Path $source) -Force | Out-Null
+    } catch {
+        $response = Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)'
+        if ($response) {
+            $PSexe = (Get-Process -Id $PID).Path # get current PowerShell executable path
+            Start-Process $PSexe "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+            if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
+                Write-Host 'Restarting script as Administrator...' -ForegroundColor Yellow
+                $PSexe = (Get-Process -Id $PID).Path # get current PowerShell executable path
+                Start-Process $PSexe "-ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+                return
+            }
+            Write-Host "Linking File: $source to local path: $destination" -ForegroundColor Cyan
+            Get-Item -Path $destination -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+            New-Item -ItemType SymbolicLink -Path $destination -Target (Resolve-Path $source) -Force | Out-Null
+        }
+    }
 }
-
-Pop-Location
 
 Write-Verbose 'refresh git config user'
 git config --global --unset user.email | Out-Null
@@ -123,6 +134,5 @@ Get-Service FontCache | Restart-Service -Force
 Write-Verbose 'refresh user space'
 RUNDLL32.EXE user32.dll, UpdatePerUserSystemParameters
 Stop-Process -Name Explorer -Force
-Start-Process Explorer
 
 return
