@@ -13,16 +13,25 @@ if ([Environment]::GetCommandLineArgs().Contains('-NonInteractive')) { return } 
 [system.console]::Clear()
 
 # Environment Variables 🌐
-if ((Get-Item -LiteralPath $PSCommandPath -Force).Target) { 
-    $Env:PSProfile = (Get-Item -LiteralPath $PSCommandPath -Force).Target
+$Env:PSexe = (Get-Process -Id $PID).Path # get current PowerShell executable path
+if ((Get-Item -LiteralPath $PSCommandPath -Force).Target) {
+    $Env:PSProfile = (Get-Item -LiteralPath $PSCommandPath -Force).Target  # handle symlink path
 } else {
     $Env:PSProfile = $PSCommandPath
 }
-$Env:ProfileRepo = (Split-Path $Env:PSProfile -Parent)
-$Env:Configs = (Join-Path $Env:ProfileRepo '.config')
-$Env:Functions = (Join-Path $Env:ProfileRepo 'functions')
-$Env:Scripts = (Join-Path $Env:ProfileRepo 'scripts')
+# 
+$Env:Profile = (Split-Path $Env:PSProfile -Parent)
+$Env:Configs = (Join-Path $Env:Profile '.config')
+$Env:Functions = (Join-Path $Env:Profile 'functions')
+$Env:Scripts = (Join-Path $Env:Profile 'scripts')
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Theme settings
 $Env:WallPapers = (Join-Path $Env:Configs 'walls')
+$Env:WallPaper = "$env:WallPapers\979745.jpg"
+$Env:LockScreen = "$env:WallPapers\986372.jpg"
+$Env:AccentColor = '57c845'
+$Env:SecondaryColor = '1f4919'
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Functions 🎉
@@ -49,23 +58,58 @@ foreach ($import in @(Get-ChildItem $Env:Functions\*.ps1 -Recurse -ErrorAction S
 function which { param($cmd) Get-Command "*$($cmd)*" }
 
 function def { param($cmd); return (Get-Command $cmd | Select-Object -ExpandProperty Definition) }
+
+function Get-UserResponse {
+    [alias('confirm')]
+    param ($Msg = 'Do you want to continue? (Y/N)')
+    do {
+        # Simple Yes/No validation loop
+        $response = Read-Host $Msg
+        $response = $response.Trim().ToUpper()
+        switch ($response) {
+            'Y' { $valid = $true; $return = $true; break }
+            'N' { $valid = $true; $return = $false; break }
+            default { Write-Host 'Invalid input. Please enter Y or N.' -ForegroundColor Red; $valid = $false; break }
+        }
+    } until ($valid)
+    return $return
+}
+
+function Update-PSModules {
+    param ([String[]]$PSModule)
+    Write-Verbose 'install PS modules'
+    foreach ($name in $PSModule) {
+        if (!(Get-Module -ListAvailable -Name $name)) {
+            Install-Module -Name $name -Force -AcceptLicense -Scope CurrentUser
+        } else {
+            Update-Module -Name $name -Force -AcceptLicense -Scope CurrentUser
+        }
+    }
+}
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Aliases 🔗
-New-Alias -Name def -Value Get-Definition
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # Prompt & Shell Configuration 🐚
-# Start-ThreadJob -ScriptBlock {
-#     Set-Location -Path $ENV:WindotsLocalRepo
-#     $gitUpdates = git fetch && git status
-#     if ($gitUpdates -match "behind") {
-#         $ENV:DOTFILES_UPDATE_AVAILABLE = "󱤛 "
-#     }
-#     else {
-#         $ENV:DOTFILES_UPDATE_AVAILABLE = ""
-#     }
-# } | Out-Null
+Start-ThreadJob -ScriptBlock {
+    Set-Location -Path $Env:Profile
+    $gitUpdates = git fetch && git status
+    if ($gitUpdates -match 'behind') {
+        $Env:PROFILE_UPDATE_AVAILABLE = $true
+    } else {
+        $Env:PROFILE_UPDATE_AVAILABLE = $false
+    }
+} | Out-Null
+
+$PSReadLineOptions = @{
+    PredictionViewStyle = 'ListView'
+    EditMode            = 'Windows'
+    PredictionSource    = 'History'
+}
+Set-PSReadLineOption @PSReadLineOptions
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #Start-ThreadJob -ScriptBlock {
 
