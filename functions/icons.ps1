@@ -1,4 +1,4 @@
-$Env:Icons = @{
+$Global:Icons = @{
     domain = @{ corp ='🏢'; retail = '🛒'; }
     toxic = '☣'
     fire = '🔥'
