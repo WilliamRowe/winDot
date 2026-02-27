@@ -40,7 +40,7 @@ param(
         '.config\fonts'                   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
     },
 
-    [Switch]$VScode = (if (Get-Command code.cmd -ErrorAction SilentlyContinue) { [Switch]::Present }),
+    [Switch]$VScode = $(if (Get-Command code.cmd -ErrorAction SilentlyContinue) { [Switch]::Present }),
 
     [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
     [Switch]$LockScreen,
@@ -54,7 +54,7 @@ param(
 # load-in current profile, first time to populate initial environment variables, functions, etc.
 if ($Force -or ($null -eq $env:SETUP_INSTALL_STATE)) {
     . .\profile.ps1
-    $env:SETUP_INSTALL_STATE = 'partial'
+
 }
 
 # move PS profile off of OneDrive, if discovered
@@ -62,25 +62,25 @@ if ($PROFILE.CurrentUserAllHosts -match [regex]::Escape($env:OneDrive)) {
     Write-Warning "PS Profile is located on OneDrive filesystem! [$($PROFILE.CurrentUserAllHosts)]
       It is recommended to move the Powershell profile off of OneDrive,
         and move it back onto to local filesystem for performance and stability."
-    if ($force -or $(Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)')) {
+    if ($force -or (Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)')) {
         Write-Host 'Attempting to move PowerShell profile off of OneDrive to local FileSystem...'
         . "$Env:Scripts\Move-ProfileLocal.ps1" @PSBoundParameters
     }
 }
 
-if ($PSModule -or $Force) { Update-PSModules $psModules } 
- 
-if ($UI -or $Force) { 
+if ($PSModule -or $Force) { Update-PSModules $psModules }
+
+if ($UI -or $Force) {
     Write-Verbose 'applying UI configurations...'
     & "$Env:Scripts\Set-UI.ps1" @PSBoundParameters -DesktopImagePath $Env:WallPaper -AccentColor $Env:AccentColor -SecondaryColor $Env:SecondaryColor
 }
 
 if ($LockScreen -or $Force) {
     Write-Verbose 'applying lock screen configurations...'
-    & "$Env:Scripts\Set-UI.ps1" -LockScreenImagePath $Env:LockScreen 
+    & "$Env:Scripts\Set-UI.ps1" -LockScreenImagePath $Env:LockScreen
 }
 
-if ($PowerConfig -or $Force) { 
+if ($PowerConfig -or $Force) {
     Write-Verbose 'applying power configurations...'
     & "$Env:Scripts\Set-PowerConfig.ps1" @PSBoundParameters
 }
