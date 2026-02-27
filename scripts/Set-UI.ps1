@@ -22,8 +22,6 @@ param (
 
     [switch]$DevMode
 )
-if (-not (Test-Path $DesktopImagePath)) { throw "Desktop image file not found: $DesktopImagePath" }
-if (-not (Test-Path $LockScreenImagePath)) { throw "Lock screen image file not found: $LockScreenImagePath" }
 
 if ($devMode) {
     if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')) {
@@ -39,17 +37,17 @@ if ($devMode) {
 if ($LockScreenImagePath) {
     Write-Verbose 'processing local machine settings:'
     $localMachineSettings = @(
-        @{ 
+        @{
             Path  = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Personalization'
             Name  = 'LockScreenImagePath'
             Value = $LockScreenImagePath
         },
-        @{ 
+        @{
             Path  = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Personalization'
             Name  = 'LockScreenImageUrl'
             Value = $LockScreenImagePath
         },
-        @{ 
+        @{
             Path  = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Personalization'
             Name  = 'LockScreenImageStatus'
             Value = 1
@@ -84,7 +82,7 @@ $currentUserSettings = @(
         Type  = 'Dword'
     },
     # Show file extensions
-    @{ 
+    @{
         Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
         Name  = 'HideFileExt'
         Value = 0
@@ -101,19 +99,19 @@ if ($accentColor) {
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\DWM'
             Name  = 'StartColor'
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\DWM'
             Name  = 'ColorizationColor'
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
             Name  = 'AccentColor'
             Value = (ConvertFrom-HexColor $AccentColor)
@@ -131,7 +129,7 @@ if ($accentColor) {
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
             Name  = 'AccentColor'
             Value = (ConvertFrom-HexColor $AccentColor)
@@ -156,7 +154,7 @@ if ($accentColor) {
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\DWM'
             Name  = 'StartColorMenu'
             Value = (ConvertFrom-HexColor $AccentColor)
@@ -175,7 +173,7 @@ if ($accentColor) {
             Value = (ConvertFrom-HexColor $AccentColor)
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\DWM'
             Name  = 'TaskbarColorOverride'
             Value = (ConvertFrom-HexColor $AccentColor)
@@ -194,13 +192,13 @@ if ($accentColor) {
             Value = 1
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
             Name  = 'ColorPrevalence'
             Value = 1
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
             Name  = 'ColorPrevalence'
             Value = 1
@@ -213,13 +211,13 @@ if ($accentColor) {
             Value = 1
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Accent'
             Name  = 'EnableWindowColorization'
             Value = 1
             Type  = 'Dword'
         },
-        @{ 
+        @{
             Path  = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
             Name  = 'EnableWindowColorization'
             Value = 1
@@ -229,7 +227,7 @@ if ($accentColor) {
 }
 
 if ($SecondaryColor) {
-    $currentUserSettings += @{ 
+    $currentUserSettings += @{
         Path  = 'HKCU:\Software\Microsoft\Windows\DWM'
         Name  = 'AccentColorInactive'
         Value = (ConvertFrom-HexColor $SecondaryColor)
@@ -247,7 +245,7 @@ if ($DesktopImagePath) {
 }
 
 switch ($TaskBarPosition) {
-    'Left' { 
+    'Left' {
         $currentUserSettings += @{
             Path  = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
             Name  = 'TaskbarAl'
@@ -255,7 +253,7 @@ switch ($TaskBarPosition) {
             Type  = 'Dword'
         }
     }
-    'Center' { 
+    'Center' {
         $currentUserSettings += @{
             Path  = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'
             Name  = 'TaskbarAl'
