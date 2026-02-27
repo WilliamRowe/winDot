@@ -1,9 +1,6 @@
 <#
     .SYNOPSIS
         Setup.ps1 - configure windows shell profile
-
-    .NOTES
-        Author: Will Rowe
 #>
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 [CmdletBinding(DefaultParameterSetName = 'Default')]
