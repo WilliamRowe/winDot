@@ -1,10 +1,26 @@
 <#
     .SYNOPSIS
         Setup.ps1 - configure windows shell profile
-#>
+
+    .NOTES
+        Author: Will Rowe
+#> 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 [CmdletBinding(DefaultParameterSetName = 'Default')]
 param(
+    [Parameter(HelpMessage = 'link configurations ( repo Source => local Destination )')]
+    $symlinks = [Ordered]@{
+        # $env:APPDAT is for roaming app data, which is not ideal for local profile files that are accessed frequently.
+        # $env:LOCALAPPDATA is ideal for profile files, and can be roamed by copying files from local to roaming paths if needed.
+        'profile.ps1'                     = $PROFILE.CurrentUserAllHosts
+        '.config\vscode\settings.json'    = "$env:APPDATA\code\user\settings.json"
+        '.config\vscode\keybindings.json' = "$env:APPDATA\code\user\keybindings.json"
+        '.config\vscode\extensions.json'  = "$env:APPDATA\code\user\extensions.json"
+        '.config\terminal\settings.json'  = "$HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+        '.config\git\.gitconfig'          = "$HOME\.gitconfig"
+        '.config\fonts'                   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+        #'bin\LogSec' = $ $env:APPDAT
+    },
     [Alias('CurrentUserSettings')]
     [Switch]$UI = [Switch]::Present,
 
@@ -24,23 +40,23 @@ param(
 
     [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
     [string[]]$Choco = @(
-        'Git'
+        'pandoc'
+        'git'
+        'firefox'
+        '7zip'
+        #'powerautomatedesktop'
+        'keepass'
         'PowerShell.Core'
+        'azure-powershell'
         'VSCode'
         'PowerToys'
+        #'python3'
+        #'winscp'
+        #'azure-cli'
+        #'go'
+        #'starship'
+        #'sysinternals'
     ),
-
-    $symlinks = [Ordered]@{
-        'profile.ps1'                     = $PROFILE.CurrentUserAllHosts
-        '.config\vscode\settings.json'    = "$env:APPDATA\code\user\settings.json"
-        '.config\vscode\keybindings.json' = "$env:APPDATA\code\user\keybindings.json"
-        '.config\vscode\extensions.json'  = "$env:APPDATA\code\user\extensions.json"
-        '.config\terminal\settings.json'  = "$HOME\AppData\Local\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
-        '.config\git\.gitconfig'          = "$HOME\.gitconfig"
-        '.config\fonts'                   = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
-    },
-
-    [Switch]$VScode = (if (Get-Command code.cmd -ErrorAction SilentlyContinue) { [Switch]::Present }),
 
     [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
     [Switch]$LockScreen,
@@ -48,27 +64,44 @@ param(
     [Parameter(Mandatory = $false, ParameterSetName = 'Admin')]
     [Switch]$PowerConfig,
 
-    [Switch]$Force
+    [Switch]$VScode = $(if (Get-Command code.cmd -ErrorAction SilentlyContinue) { [Switch]::Present })
 )
 #Requires -Version 7.0
-# load-in current profile, first time to populate initial environment variables, functions, etc.
-if ($Force -or ($null -eq $env:SETUP_INSTALL_STATE)) {
-    . .\profile.ps1
-    $env:SETUP_INSTALL_STATE = 'partial'
-}
+if ($null -eq $env:SETUP_INSTALL_STATE) { $env:SETUP_INSTALL_STATE = 'incomplete' }
+# load-in current profile, populate environment variables, functions, etc.
+. .\profile.ps1
 
-# move PS profile off of OneDrive, if discovered
+# move PS profile off OneDrive, if discovered
 if ($PROFILE.CurrentUserAllHosts -match [regex]::Escape($env:OneDrive)) {
     Write-Warning "PS Profile is located on OneDrive filesystem! [$($PROFILE.CurrentUserAllHosts)]
       It is recommended to move the Powershell profile off of OneDrive,
         and move it back onto to local filesystem for performance and stability."
-    if ($force -or $(Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)')) {
+    $response = Get-UserResponse 'Relocate PowerShell Profile to local filesystem? (Y/N)'
+    if ($response) {
         Write-Host 'Attempting to move PowerShell profile off of OneDrive to local FileSystem...'
         . "$Env:Scripts\Move-ProfileLocal.ps1" @PSBoundParameters
     }
 }
+#region - configure addons
 
-if ($PSModule -or $Force) { Update-PSModules $psModules } 
+<# TODO: function to update Choco packages
+   if ( choco obsolete -l ) {
+        choco upgrade all -y
+    }
+#>
+if ($Choco) {
+    $installed = choco list -l
+    foreach ($pkg in $Choco) {
+        if ($installed -match $pkg) { 
+            Write-Verbose "Choco package $pkg already installed"
+            continue
+        }
+        Write-Host "Installing Choco package $pkg . . "
+        Choco install $pkg
+    }
+}
+
+if ($PSModule) { Update-PSModules $psModules } 
  
 if ($UI -or $Force) { 
     Write-Verbose 'applying UI configurations...'
@@ -85,14 +118,16 @@ if ($PowerConfig -or $Force) {
     & "$Env:Scripts\Set-PowerConfig.ps1" @PSBoundParameters
 }
 
-if ($VScode -or $Force) {
+if ($VScode) {
     . "$Env:Scripts\Install-VSCodeExtension.ps1" @PSBoundParameters -Extensions (Get-Content (Join-Path $env:Configs 'vscode\extensions.json') -Raw | ConvertFrom-Json).recommendations
 }
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#endRegion # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 Write-Verbose 'capture current git user'
 $currentGitEmail = (git config --global user.email)
 $currentGitName = (git config --global user.name)
 
+#region - configure Symlinks
 Write-Verbose 'Create Symbolic Links'
 foreach ($symlink in $symlinks.GetEnumerator()) {
     $source = $symlink.key; $destination = $symlink.value
@@ -118,6 +153,8 @@ foreach ($symlink in $symlinks.GetEnumerator()) {
         }
     }
 }
+#endRegion # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 Write-Verbose 'refresh git config user'
 git config --global --unset user.email | Out-Null
