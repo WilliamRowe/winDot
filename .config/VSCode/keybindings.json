@@ -66,5 +66,10 @@
         "key": "shift+alt+r",
         "command": "-remote-wsl.revealInExplorer",
         "when": "editorFocus && remoteName == 'wsl'"
+    },
+    {
+        "key": "ctrl+shift+m",
+        "command": "workbench.view.extension.project-manager",
+        "when": "viewContainer.workbench.view.extension.project-manager.enabled"
     }
 ]

@@ -1,7 +1,8 @@
 {
     "security.allowedUNCHosts": [
         "wsl.localhost",
-        "wsl$"
+        "wsl$",
+        "p47rtblds01"
     ],
     "liveServer.settings.donotShowInfoMsg": true,
     "remote.autoForwardPortsSource": "hybrid",
@@ -61,5 +62,24 @@
     "powershell.pester.outputVerbosity": "Detailed",
     "powershell.pester.debugOutputVerbosity": "Detailed",
     "code-runner.clearPreviousOutput": true,
-    "code-runner.runInTerminal": true
+    "code-runner.runInTerminal": true,
+    "highlightDuplicates.active": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "terminal.integrated.allowedLinkSchemes": [
+        "file",
+        "http",
+        "https",
+        "mailto",
+        "vscode",
+        "vscode-insiders",
+        "ms-settings"
+    ],
+    "powershell.pester.codeLens": false,
+    "cSpell.userWords": [
+        "mstsc",
+        "Runas"
+    ],
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "projectManager.sortList": "Saved"
+    // "chat.viewSessions.orientation": "stacked"
 }
